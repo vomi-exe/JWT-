@@ -1,22 +1,32 @@
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
-app.use(express.json());
+const User = require("./models/userModel.js");
 
-const users = [
-  {
-    id: "1",
-    username: "john",
-    password: "password",
-    isAdmin: true,
-  },
-  {
-    id: "2",
-    username: "jane",
-    password: "password",
-    isAdmin: false,
-  },
-];
+//Connection to DB
+const mongoose = require("mongoose");
+
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(
+      "mongodb+srv://admin:admin123@clustersocio.aawj5.mongodb.net/LoginAppDB",
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+      }
+    );
+
+    console.log(`Database Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`error: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+connectDB();
+
+app.use(express.json());
 
 let refreshTokens = [];
 
@@ -48,33 +58,58 @@ app.post("/api/refresh", (req, res) => {
 });
 
 const generateAccessToken = (user) => {
-  return jwt.sign({ id: user.id, isAdmin: user.isAdmin }, "mySecretKey", {
-    expiresIn: "5s",
+  return jwt.sign({ id: user._id, isAdmin: user.isAdmin }, "mySecretKey", {
+    expiresIn: "15m",
   });
 };
 
 const generateRefreshToken = (user) => {
-  return jwt.sign({ id: user.id, isAdmin: user.isAdmin }, "myRefreshSecretKey");
+  return jwt.sign(
+    { id: user._id, isAdmin: user.isAdmin },
+    "myRefreshSecretKey"
+  );
 };
 
-app.post("/api/login", (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find((u) => {
-    return u.username === username && u.password === password;
-  });
-  if (user) {
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email: email });
+  if (user && (await user.matchPassword(password))) {
     //Generate an access token
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
     refreshTokens.push(refreshToken);
+    const { password, __v, createdAt, updatedAt, _id, ...others } = user._doc;
     res.json({
-      username: user.username,
-      isAdmin: user.isAdmin,
+      ...others,
       accessToken,
       refreshToken,
     });
   } else {
     res.status(400).json("Username or password incorrect!");
+  }
+});
+
+app.post("/api/register", async (req, res) => {
+  const data = req.body;
+  const userExists = await User.findOne({ email: data.email });
+
+  if (userExists) {
+    res.status(400).json("user already exists");
+  }
+
+  const user = await User.create(data);
+  if (user) {
+    const { password, __v, createdAt, updatedAt, _id, ...others } = user._doc;
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+    res.status(201).json({
+      _id,
+      ...others,
+      accessToken,
+      refreshToken,
+    });
+  } else {
+    res.status(400).json("invalid user data");
   }
 });
 
@@ -84,12 +119,11 @@ const verify = (req, res, next) => {
     const token = authHeader.split(" ")[1];
 
     jwt.verify(token, "mySecretKey", (err, user) => {
+      req.user._id = user._id;
+      next();
       if (err) {
         return res.status(403).json("Token is not valid!");
       }
-
-      req.user = user;
-      next();
     });
   } else {
     res.status(401).json("You are not authenticated!");
@@ -97,7 +131,7 @@ const verify = (req, res, next) => {
 };
 
 app.delete("/api/users/:userId", verify, (req, res) => {
-  if (req.user.id === req.params.userId || req.user.isAdmin) {
+  if (req.user._id === req.params.userId || req.user.isAdmin) {
     res.status(200).json("User has been deleted.");
   } else {
     res.status(403).json("You are not allowed to delete this user!");
