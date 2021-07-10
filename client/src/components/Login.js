@@ -2,16 +2,21 @@ import "./Login.css";
 import React from "react";
 import axios from "axios";
 import { useState } from "react";
+import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 export const Login = ({ location }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const history = useHistory();
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const res = await axios.post("/login", { email, password });
       localStorage.setItem("userInfo", JSON.stringify(res.data));
+      history.push("/");
+      window.location.reload();
     } catch (err) {
       console.log(err);
     }
@@ -32,7 +37,7 @@ export const Login = ({ location }) => {
             placeholder="password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button action="/" type="submit" className="submitButton">
+          <button type="submit" className="submitButton">
             Login
           </button>
         </form>

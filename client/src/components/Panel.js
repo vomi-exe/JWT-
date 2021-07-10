@@ -50,6 +50,13 @@ export const Panel = (user) => {
       setError(true);
     }
   };
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    localStorage.removeItem("userInfo");
+    window.location.reload();
+  };
+
   return (
     <>
       <div className="home">
@@ -72,6 +79,9 @@ export const Panel = (user) => {
         {success && (
           <span className="success">User has been deleted successfully...</span>
         )}
+      </div>
+      <div>
+        <button onClick={handleLogout}>Logout</button>
       </div>
     </>
   );

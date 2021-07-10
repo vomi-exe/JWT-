@@ -2,20 +2,22 @@ const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
 const User = require("./models/userModel.js");
+const totp = require("totp-generator");
+const fast2sms = require("fast-two-sms");
+const dotenv = require("dotenv");
 
+let verifyResponse = {};
+dotenv.config();
 //Connection to DB
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(
-      "mongodb+srv://admin:admin123@clustersocio.aawj5.mongodb.net/LoginAppDB",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true,
-      }
-    );
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    });
 
     console.log(`Database Connected: ${conn.connection.host}`);
   } catch (error) {
@@ -58,15 +60,19 @@ app.post("/api/refresh", (req, res) => {
 });
 
 const generateAccessToken = (user) => {
-  return jwt.sign({ id: user._id, isAdmin: user.isAdmin }, "mySecretKey", {
-    expiresIn: "15m",
-  });
+  return jwt.sign(
+    { id: user._id, isAdmin: user.isAdmin },
+    process.env.ACCESS_KEY,
+    {
+      expiresIn: "15m",
+    }
+  );
 };
 
 const generateRefreshToken = (user) => {
   return jwt.sign(
     { id: user._id, isAdmin: user.isAdmin },
-    "myRefreshSecretKey"
+    process.env.REFRESH_KEY
   );
 };
 
@@ -99,9 +105,10 @@ app.post("/api/register", async (req, res) => {
 
   const user = await User.create(data);
   if (user) {
-    const { password, __v, createdAt, updatedAt, _id, ...others } = user._doc;
+    const { password, _id, mobilenumber, ...others } = user._doc;
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
+
     res.status(201).json({
       _id,
       ...others,
@@ -113,12 +120,41 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
+app.post("/api/generateOTP", async (req, res) => {
+  const token = totp(process.env.OTP_KEY, {
+    digits: 6,
+    algorithm: "SHA-512",
+    period: 60000,
+  });
+  console.log(req.body.mobilenumber);
+  var options = {
+    authorization: process.env.F2S_KEY,
+    message: `You OTP is : ${token}`,
+    numbers: [req.body.mobilenumber],
+  };
+  const response = await fast2sms.sendMessage(options);
+  console.log(response);
+});
+
+app.post("/api/verify", (req, res) => {
+  const token = totp(process.env.OTP_KEY, {
+    digits: 6,
+    algorithm: "SHA-512",
+    period: 60000,
+  });
+  if (req.body.otpvalue === token) {
+    res.status(200).json("Verified");
+  } else {
+    res.status(403).json("Invalid");
+  }
+});
+
 const verify = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (authHeader) {
     const token = authHeader.split(" ")[1];
 
-    jwt.verify(token, "mySecretKey", (err, user) => {
+    jwt.verify(token, process.env.ACCESS_KEY, (err, user) => {
       req.user._id = user._id;
       next();
       if (err) {

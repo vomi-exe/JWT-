@@ -3,6 +3,7 @@ import { Login } from "./components/Login";
 import { Panel } from "./components/Panel";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { Registor } from "./components/Registor";
+
 function App() {
   const user = JSON.parse(localStorage.getItem("userInfo"));
   console.log(user);
