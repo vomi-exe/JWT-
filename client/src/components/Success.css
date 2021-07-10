@@ -1,0 +1,25 @@
+.successh1 {
+  font-family: fantasy;
+  font-size: 80px;
+  color: rgb(107, 179, 107);
+}
+
+.successh4 {
+  font: 24px;
+}
+
+button.logout {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  padding: 10px;
+  font-size: 14px;
+  outline: none;
+  border-radius: 5px;
+  background-color: rgb(190, 68, 68);
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button.logout:hover {
+  background-color: rgb(212, 141, 141);
+}

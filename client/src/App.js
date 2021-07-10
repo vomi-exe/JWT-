@@ -1,6 +1,6 @@
 import "./App.css";
 import { Login } from "./components/Login";
-import { Panel } from "./components/Panel";
+import { Success } from "./components/Success";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { Registor } from "./components/Registor";
 
@@ -10,9 +10,11 @@ function App() {
 
   return (
     <Router>
-      <Route path="/register" component={Registor}></Route>
+      <Route path="/register">
+        <Registor />
+      </Route>
       <Route path="/" exact>
-        {user ? <Panel user={user} /> : <Login />}
+        {user ? <Success user={user} /> : <Login />}
       </Route>
     </Router>
   );

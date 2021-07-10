@@ -26,22 +26,26 @@ export const Login = ({ location }) => {
     <div className="container">
       <div className="login">
         <form onSubmit={handleSubmit}>
-          <span className="formTitle">LOGIN</span>
+          <span className="formTitleLogin">LOGIN</span>
           <input
+            className="inputLogin"
             type="email"
             placeholder="email"
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
+            className="inputLogin"
             type="password"
             placeholder="password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button type="submit" className="submitButton">
+          <button type="submit" className="submitButtonLogin">
             Login
           </button>
         </form>
-        New User? <Link to="/register">Register</Link>
+        <div className="RegisterLogin">
+          New User? <Link to="/register">Register</Link>
+        </div>
       </div>
     </div>
   );

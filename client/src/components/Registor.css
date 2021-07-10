@@ -1,22 +1,95 @@
 body {
-  margin: 0;
   padding: 100px 500px;
+  background-color: rgb(231, 225, 225);
 }
+.cover {
+  background-color: white;
+  padding: 10px;
+  outline: none;
+  border-radius: 5px;
+  border: 1px solid lightgray;
+  box-sizing: content-box;
+  overflow: hidden;
+}
+
+.heading {
+  text-align: center;
+}
+
 .formcontainer {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
 }
-.countrySelect {
+
+.RegisterInput {
   padding: 10px;
-  width: 100%;
+  width: 90%;
+  border: 1px solid lightgray;
+  border-radius: 3px;
   font-size: 14px;
   margin: 15px;
+}
+.pinbtn {
+  position: relative;
+  bottom: 46px;
+  left: 410px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.countrySelect {
+  padding: 10px;
+  width: 90%;
+  font-size: 14px;
+  margin: 15px;
+  border-radius: 3px;
 }
 
 .regionSelect {
   padding: 10px;
-  width: 100%;
+  width: 90%;
   font-size: 14px;
   margin: 15px;
+  border-radius: 3px;
+}
+
+.btn-submit {
+  width: 60%;
+  padding: 10px;
+  background-color: green;
+  color: white;
+  margin-top: 20px;
+  margin-left: 100px;
+  cursor: pointer;
+}
+
+.otpcover {
+  border-radius: 5px;
+  border: 1px solid lightgray;
+  background-color: white;
+  padding: 50px;
+}
+.otpheading {
+  text-align: center;
+}
+
+.otpinput {
+  position: relative;
+  left: 70px;
+}
+.otpinput input {
+  box-sizing: border-box;
+  font-size: 40px;
+}
+.otpbtn {
+  margin-top: 50px;
+  margin-left: 100px;
+  width: 50%;
+  padding: 10px;
+  cursor: pointer;
+  background-color: rgb(226, 197, 143);
+}
+.otperror {
+  text-align: center;
 }

@@ -5,7 +5,7 @@
 .login,
 .home {
   width: 200px;
-  height: 200px;
+  height: 300px;
   padding: 20px;
   position: absolute;
   top: 0;
@@ -13,11 +13,12 @@
   left: 0;
   right: 0;
   margin: auto;
+  background-color: white;
   border: 1px solid lightgray;
   border-radius: 10px;
 }
 
-form {
+.login form {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -25,32 +26,35 @@ form {
   justify-content: space-around;
 }
 
-.formTitle {
-  color: teal;
+.formTitleLogin {
+  color: rgb(22, 163, 116);
   font-weight: bold;
 }
 
-input {
+.inputLogin {
   height: 30px;
   border: none;
   border-bottom: 1px solid lightgray;
 }
 
-input:focus {
+.inputLogin:focus {
   outline: none;
 }
 
-.submitButton {
+.submitButtonLogin {
   width: 100px;
   padding: 10px;
   border: none;
   border-radius: 10px;
-  background-color: teal;
+  background-color: rgb(194, 130, 46);
   color: white;
   cursor: pointer;
 }
 
-.home {
+.RegisterLogin {
+  text-align: center;
+}
+/* .home {
   width: 300px;
   height: 250px;
   display: flex;
@@ -81,4 +85,4 @@ input:focus {
 .success {
   font-size: 12px;
   color: green;
-}
+} */

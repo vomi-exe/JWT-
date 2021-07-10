@@ -146,6 +146,7 @@ app.post("/api/verify", (req, res) => {
     res.status(200).json("Verified");
   } else {
     res.status(403).json("Invalid");
+    console.log("INVALID");
   }
 });
 

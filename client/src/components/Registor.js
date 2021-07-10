@@ -3,6 +3,8 @@ import "./Registor.css";
 import { CountryDropdown, RegionDropdown } from "react-country-region-selector";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import OtpInput from "react-otp-input";
+import { useHistory } from "react-router";
 
 export const Registor = () => {
   const fName = useRef();
@@ -22,7 +24,12 @@ export const Registor = () => {
   const [otpstate, setOtpstate] = useState(false);
   const [error, setError] = useState(false);
   const [errorPin, setErrorPin] = useState(false);
-  const otp = useRef();
+  const [otp, setOtp] = useState("");
+  const history = useHistory();
+
+  const handleOtpChange = (otp) => {
+    setOtp(otp);
+  };
 
   const cityValue = (res) => {
     setCity(res.data[0].PostOffice[0].District);
@@ -38,12 +45,14 @@ export const Registor = () => {
   };
 
   const handlePincode = async (event) => {
-    if (pincode.current.value > 100000) {
+    event.preventDefault();
+    if (pincode.current.value.toString().length > 5) {
       const res = await axios.get(
         `https://api.postalpincode.in/pincode/${pincode.current.value}`
       );
       console.log(res);
-      if (res.status === 200) {
+      if (res.data[0].Status === "Success") {
+        setErrorPin(false);
         cityValue(res);
         countryValue(res);
         regionValue(res);
@@ -81,91 +90,164 @@ export const Registor = () => {
   };
 
   const handleSubmit = async (e) => {
-    const otpvalue = otp.current.value;
-    const res = await axios.post("/verify", { otpvalue });
-    console.log(res);
-    if (res.data === "Verified") {
-      const responce = await axios.post("/register", data);
-      if (responce.status === 201) {
-      }
-    } else {
+    e.preventDefault();
+    const otpvalue = otp;
+    console.log(otpvalue);
+    if (otpvalue.toString().length < 5) {
       setError(true);
-      e.preventDefault();
+    } else {
+      const res = await axios.post("/verify", { otpvalue });
+      if (res.data === "Verified") {
+        const responce = await axios.post("/register", data);
+        if (responce.status === 201) {
+          history.push("/");
+        }
+      } else {
+        setError(true);
+        e.preventDefault();
+      }
     }
   };
 
   return (
     <div>
       {otpstate ? (
-        <div>
-          <form action="/">
-            <h1>Please Enter the OTP recived</h1>
-            <label>Enter OTP:</label>
-            <input required ref={otp} type="tel"></input>
-            <button type="submit" onClick={handleSubmit}>
+        <div className="otpcover">
+          <form>
+            <h1 className="otpheading">Please Enter the OTP recived</h1>
+
+            <OtpInput
+              isInputNum
+              className="otpinput"
+              value={otp}
+              onChange={handleOtpChange}
+              numInputs={6}
+              separator={<span>-</span>}
+            />
+            <button className="otpbtn" type="submit" onClick={handleSubmit}>
               Submit
             </button>
           </form>
           {error && (
-            <div>
+            <div className="otperror">
               {" "}
-              OTP is invalid <br /> <Link to="/register">
+              OTP is invalid <br />
+              <br />
+              <Link
+                to="/register"
+                onClick={() => {
+                  setOtpstate(false);
+                }}
+              >
                 Register Again
               </Link>{" "}
             </div>
           )}
         </div>
       ) : (
-        <div>
-          <h1>Sign Up</h1>
+        <div className="cover">
+          <h1 className="heading">Sign Up</h1>
           <form className="formcontainer" action="/">
             <div>
               <label>First Name:</label>
-              <input required ref={fName} type="text"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={fName}
+                type="text"
+              ></input>
             </div>
             <div>
               <label>Last Name:</label>
-              <input required ref={lName} type="text"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={lName}
+                type="text"
+              ></input>
             </div>
             <div>
               <label>Email:</label>
-              <input required ref={email} type="email"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={email}
+                type="email"
+              ></input>
             </div>
             <div>
               <label>Password:</label>
-              <input required ref={password} type="password"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={password}
+                type="password"
+              ></input>
             </div>
             <div>
               <label>Confirm Password:</label>
-              <input required ref={passwordConfirm} type="password"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={passwordConfirm}
+                type="password"
+              ></input>
             </div>
             <div>
               <label>Mobile Number:</label>
-              <input required ref={mobileNumber} type="number"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={mobileNumber}
+                type="tel"
+              ></input>
             </div>
             <div>
               <label>Date Of Birth:</label>
-              <input required ref={dateOfBirth} type="date"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={dateOfBirth}
+                type="date"
+              ></input>
             </div>
             <div>
               <label>Education:</label>
-              <input required ref={education} type="text"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={education}
+                type="text"
+              ></input>
             </div>
             <div>
               <label>Address:</label>
-              <input required ref={address} type="text"></input>
+              <input
+                className="RegisterInput"
+                required
+                ref={address}
+                type="text"
+              ></input>
             </div>
             <div>
               <label>Pincode:</label>
-              <input required ref={pincode} type="tel"></input>
-              <button type="submit" onClick={handlePincode}>
+              <input
+                className="RegisterInput"
+                required
+                ref={pincode}
+                type="tel"
+              ></input>
+              <button className="pinbtn" type="submit" onClick={handlePincode}>
                 Enter
               </button>
-              {errorPin && <p>Please enter a valid pin</p>}
+              {errorPin && (
+                <p style={{ color: "red" }}> Please enter a valid pin</p>
+              )}
             </div>
             <div>
               <label>City:</label>
               <input
+                className="RegisterInput"
                 required
                 name="city"
                 value={city}
@@ -196,7 +278,7 @@ export const Registor = () => {
               <label>Attachment:</label>
               <input type="file"></input>
             </div>
-            <button type="submit" onClick={onSubmit}>
+            <button type="submit" className="btn-submit" onClick={onSubmit}>
               Submit
             </button>
           </form>
