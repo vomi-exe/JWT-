@@ -1,3 +1,4 @@
+const nodemailer = require("nodemailer");
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
@@ -102,7 +103,7 @@ app.post("/register", async (req, res) => {
   const userExists = await User.findOne({ email: data.email });
 
   if (userExists) {
-    res.status(400).json("user already exists");
+    res.status(400).json("User already exists");
   }
 
   const user = await User.create(data);
@@ -118,7 +119,7 @@ app.post("/register", async (req, res) => {
       refreshToken,
     });
   } else {
-    res.status(400).json("invalid user data");
+    res.status(401).json("invalid user data");
   }
 });
 
@@ -129,6 +130,7 @@ app.post("/generateOTP", async (req, res) => {
     period: 600,
   });
   console.log(req.body.mobilenumber);
+  // SEND OTP MOBILE!
   var options = {
     authorization: process.env.F2S_KEY,
     message: `You OTP is : ${token}`,
@@ -136,6 +138,29 @@ app.post("/generateOTP", async (req, res) => {
   };
   const response = await fast2sms.sendMessage(options);
   console.log(response);
+  //SEND OTP MAIL
+  const transporter = nodemailer.createTransport({
+    service: "hotmail",
+    auth: {
+      user: "mehtavomi@gmail.com",
+      pass: "youdontnO",
+    },
+  });
+
+  const mailOptions = {
+    from: "mehtavomi@gmail.com",
+    to: req.body.email,
+    subject: "Your OTP for Sign Up",
+    text: `Your One Time Password is : ${token}`,
+  };
+
+  await transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+    } else {
+      cosnole.log("Email Sent : " + info.response);
+    }
+  });
 });
 
 app.post("/verify", (req, res) => {

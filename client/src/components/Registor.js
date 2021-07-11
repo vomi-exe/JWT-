@@ -85,7 +85,10 @@ export const Registor = () => {
     };
     setData(data);
     const generateOTP = async () => {
-      await axios.post("/generateOTP", { mobilenumber: data.mobilenumber });
+      await axios.post("/generateOTP", {
+        email: data.email,
+        mobilenumber: data.mobilenumber,
+      });
     };
     if (data.mobilenumber.toString().length > 9) {
       generateOTP();
@@ -107,10 +110,10 @@ export const Registor = () => {
     } else {
       const res = await axios.post("/verify", { otpvalue });
       if (res.status === 200) {
+        setSuccess(true);
         const responce = await axios.post("/register", data);
         if (responce.status === 201) {
-          setSuccess(true);
-          window.setInterval(history.push("/"), 3000);
+          window.setInterval(history.push("/"), 5000);
         }
       } else {
         setError(true);
@@ -153,7 +156,11 @@ export const Registor = () => {
               </Link>{" "}
             </div>
           )}
-          {success && <div>SUCCESFULLY REGISTERED!</div>}
+          {success && (
+            <div style={{ color: "green", marginLeft: "100px" }}>
+              SUCCESFULLY REGISTERED!
+            </div>
+          )}
         </div>
       ) : (
         <div className="cover">
@@ -260,8 +267,10 @@ export const Registor = () => {
             </div>
             <div>
               <label>City:</label>
+              <p>Enter Pincode to get City</p>
               <input
                 className="RegisterInput"
+                disabled
                 required
                 name="city"
                 value={city}
