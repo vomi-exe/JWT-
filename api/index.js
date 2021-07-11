@@ -126,7 +126,7 @@ app.post("/generateOTP", async (req, res) => {
   const token = totp(process.env.OTP_KEY, {
     digits: 6,
     algorithm: "SHA-512",
-    period: 60,
+    period: 600,
   });
   console.log(req.body.mobilenumber);
   var options = {
@@ -142,7 +142,7 @@ app.post("/verify", (req, res) => {
   const token = totp(process.env.OTP_KEY, {
     digits: 6,
     algorithm: "SHA-512",
-    period: 60,
+    period: 600,
   });
   if (req.body.otpvalue === token) {
     res.status(200).json("Verified");

@@ -27,6 +27,7 @@ export const Registor = () => {
   const [otp, setOtp] = useState("");
   const [mobileErr, setMobileErr] = useState(false);
   const history = useHistory();
+  const [success, setSuccess] = useState(false);
 
   const handleOtpChange = (otp) => {
     setOtp(otp);
@@ -105,10 +106,11 @@ export const Registor = () => {
       setError(true);
     } else {
       const res = await axios.post("/verify", { otpvalue });
-      if (res.data === "Verified") {
+      if (res.status === 200) {
         const responce = await axios.post("/register", data);
         if (responce.status === 201) {
-          history.push("/");
+          setSuccess(true);
+          window.setInterval(history.push("/"), 3000);
         }
       } else {
         setError(true);
@@ -151,6 +153,7 @@ export const Registor = () => {
               </Link>{" "}
             </div>
           )}
+          {success && <div>SUCCESFULLY REGISTERED!</div>}
         </div>
       ) : (
         <div className="cover">
