@@ -14,7 +14,7 @@ function App() {
         <Registor />
       </Route>
       <Route path="/" exact>
-        {user ? <Success user={user} /> : <Login />}
+        {user ? <Success /> : <Login />}
       </Route>
     </Router>
   );

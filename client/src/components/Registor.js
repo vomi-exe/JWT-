@@ -25,6 +25,7 @@ export const Registor = () => {
   const [error, setError] = useState(false);
   const [errorPin, setErrorPin] = useState(false);
   const [otp, setOtp] = useState("");
+  const [mobileErr, setMobileErr] = useState(false);
   const history = useHistory();
 
   const handleOtpChange = (otp) => {
@@ -82,11 +83,18 @@ export const Registor = () => {
       country: country,
     };
     setData(data);
-    setOtpstate(true);
     const generateOTP = async () => {
       await axios.post("/generateOTP", { mobilenumber: data.mobilenumber });
     };
-    generateOTP();
+    if (data.mobilenumber.toString().length > 9) {
+      generateOTP();
+      setMobileErr(false);
+    } else {
+      setMobileErr(true);
+    }
+    if (!mobileErr) {
+      setOtpstate(true);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -201,6 +209,9 @@ export const Registor = () => {
                 ref={mobileNumber}
                 type="tel"
               ></input>
+              {mobileErr && (
+                <div style={{ color: "red" }}>please enter a valid number</div>
+              )}
             </div>
             <div>
               <label>Date Of Birth:</label>

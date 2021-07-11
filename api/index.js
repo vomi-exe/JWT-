@@ -5,9 +5,11 @@ const User = require("./models/userModel.js");
 const totp = require("totp-generator");
 const fast2sms = require("fast-two-sms");
 const dotenv = require("dotenv");
+const path = require("path");
 
 let verifyResponse = {};
 dotenv.config();
+
 //Connection to DB
 const mongoose = require("mongoose");
 
@@ -76,7 +78,7 @@ const generateRefreshToken = (user) => {
   );
 };
 
-app.post("/api/login", async (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email });
   if (user && (await user.matchPassword(password))) {
@@ -95,7 +97,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-app.post("/api/register", async (req, res) => {
+app.post("/register", async (req, res) => {
   const data = req.body;
   const userExists = await User.findOne({ email: data.email });
 
@@ -120,7 +122,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-app.post("/api/generateOTP", async (req, res) => {
+app.post("/generateOTP", async (req, res) => {
   const token = totp(process.env.OTP_KEY, {
     digits: 6,
     algorithm: "SHA-512",
@@ -136,7 +138,7 @@ app.post("/api/generateOTP", async (req, res) => {
   console.log(response);
 });
 
-app.post("/api/verify", (req, res) => {
+app.post("/verify", (req, res) => {
   const token = totp(process.env.OTP_KEY, {
     digits: 6,
     algorithm: "SHA-512",
@@ -167,7 +169,7 @@ const verify = (req, res, next) => {
   }
 };
 
-app.delete("/api/users/:userId", verify, (req, res) => {
+app.delete("/users/:userId", verify, (req, res) => {
   if (req.user._id === req.params.userId || req.user.isAdmin) {
     res.status(200).json("User has been deleted.");
   } else {
@@ -175,10 +177,19 @@ app.delete("/api/users/:userId", verify, (req, res) => {
   }
 });
 
-app.post("/api/logout", verify, (req, res) => {
+app.post("/logout", verify, (req, res) => {
   const refreshToken = req.body.token;
   refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
   res.status(200).json("You logged out successfully.");
 });
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/build")));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "..", "client", "build", "index.html"))
+  );
+}
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(5000, () => console.log("Backend server is running!"));

@@ -12,6 +12,7 @@
     "messagebird": "^3.6.4",
     "mongoose": "^5.13.2",
     "nodemon": "^2.0.7",
+    "path": "^0.12.7",
     "totp-generator": "0.0.9",
     "twilio": "^3.65.0"
   },
