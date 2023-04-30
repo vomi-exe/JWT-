@@ -110,9 +110,9 @@ export const Registor = () => {
     } else {
       const res = await axios.post("/verify", { otpvalue });
       if (res.status === 200) {
-        setSuccess(true);
         const responce = await axios.post("/register", data);
         if (responce.status === 201) {
+          setSuccess(true);
           window.setInterval(history.push("/"), 5000);
         }
       } else {

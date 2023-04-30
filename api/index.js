@@ -7,6 +7,7 @@ const totp = require("totp-generator");
 const fast2sms = require("fast-two-sms");
 const dotenv = require("dotenv");
 const path = require("path");
+var unirest = require("unirest");
 
 let verifyResponse = {};
 dotenv.config();
@@ -131,19 +132,32 @@ app.post("/generateOTP", async (req, res) => {
   });
   console.log(req.body.mobilenumber);
   // SEND OTP MOBILE!
-  var options = {
-    authorization: process.env.F2S_KEY,
-    message: `You OTP is : ${token}`,
-    numbers: [req.body.mobilenumber],
-  };
-  const response = await fast2sms.sendMessage(options);
-  console.log(response);
+  var request = unirest("POST", "https://www.fast2sms.com/dev/bulkV2");
+  request.headers({
+    "authorization": `${process.env.F2S_KEY}`
+  });
+  request.form({
+    "sender_id": "TXTIND",
+    "message": `Your OTP is ${token}`,
+    "route": "v3",
+    "numbers": `${req.body.mobilenumber}`,
+  });
+  console.log(request);
+  try {
+    request.end(function (response) {
+      console.log(response.body);
+      res.status(200).json(response.body);
+    });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+
   //SEND OTP MAIL
   const transporter = nodemailer.createTransport({
     service: "hotmail",
     auth: {
       user: "mehtavomi@gmail.com",
-      pass: "youdontnO",
+      pass: "XXXXXXXXXXXXX",
     },
   });
 
