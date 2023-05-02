@@ -142,7 +142,7 @@ app.post("/generateOTP", async (req, res) => {
     "route": "v3",
     "numbers": `${req.body.mobilenumber}`,
   });
-  console.log(request);
+  console.log(token);
   try {
     request.end(function (response) {
       console.log(response.body);

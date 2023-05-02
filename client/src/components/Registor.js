@@ -250,7 +250,7 @@ export const Registor = () => {
                 type="text"
               ></input>
             </div>
-            <div>
+            <div className="pincode-div">
               <label>Pincode:</label>
               <input
                 className="RegisterInput"
@@ -278,7 +278,7 @@ export const Registor = () => {
                 type="text"
               ></input>
             </div>
-            <div>
+            <div className="add-div">
               <label>Country:</label>
               <CountryDropdown
                 required
