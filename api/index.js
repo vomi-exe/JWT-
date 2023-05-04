@@ -4,12 +4,19 @@ const app = express();
 const jwt = require("jsonwebtoken");
 const User = require("./models/userModel.js");
 const totp = require("totp-generator");
-const fast2sms = require("fast-two-sms");
 const dotenv = require("dotenv");
 const path = require("path");
 var unirest = require("unirest");
+const cors = require("cors");
 
 let verifyResponse = {};
+
+const corsOpts = {
+    origin: '*',
+    methods: [
+        'POST'
+    ]
+};
 dotenv.config();
 
 //Connection to DB
@@ -35,7 +42,7 @@ connectDB();
 app.use(express.json());
 
 let refreshTokens = [];
-
+app.use(cors(corsOpts));
 app.post("/api/refresh", (req, res) => {
   //take the refresh token from the user
   const refreshToken = req.body.token;
