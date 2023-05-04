@@ -85,7 +85,7 @@ export const Registor = () => {
     };
     setData(data);
     const generateOTP = async () => {
-      await axios.post("/generateOTP", {
+      await axios.post("https://signup-app-5hk3.onrender.com/generateOTP", {
         email: data.email,
         mobilenumber: data.mobilenumber,
       });
@@ -108,9 +108,9 @@ export const Registor = () => {
     if (otpvalue.toString().length < 5) {
       setError(true);
     } else {
-      const res = await axios.post("/verify", { otpvalue });
+      const res = await axios.post("https://signup-app-5hk3.onrender.com/verify", { otpvalue });
       if (res.status === 200) {
-        const responce = await axios.post("/register", data);
+        const responce = await axios.post("https://signup-app-5hk3.onrender.com/register", data);
         if (responce.status === 201) {
           setSuccess(true);
           window.setInterval(history.push("/"), 5000);

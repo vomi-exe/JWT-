@@ -9,7 +9,7 @@ export const Panel = (user) => {
 
   const refreshToken = async () => {
     try {
-      const res = await axios.post("/refresh", { token: user.refreshToken });
+      const res = await axios.post("https://signup-app-5hk3.onrender.com/refresh", { token: user.refreshToken });
       localStorage.setItem("userInfo", {
         ...user,
         accessToken: res.data.accessToken,
@@ -42,7 +42,7 @@ export const Panel = (user) => {
     setSuccess(false);
     setError(false);
     try {
-      await axiosToken.delete("/users/" + id, {
+      await axiosToken.delete("https://signup-app-5hk3.onrender.com/users/" + id, {
         headers: { authorization: "Bearer " + user.accessToken },
       });
       setSuccess(true);

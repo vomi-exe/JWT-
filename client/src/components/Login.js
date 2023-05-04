@@ -13,7 +13,7 @@ export const Login = ({ location }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/login", { email, password });
+      const res = await axios.post("https://signup-app-5hk3.onrender.com/login", { email, password });
       localStorage.setItem("userInfo", JSON.stringify(res.data));
       history.push("/");
       window.location.reload();
